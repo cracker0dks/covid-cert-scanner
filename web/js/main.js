@@ -12,8 +12,10 @@ $(document).ready(function () {
         multiple: false,
         skipDuplicates: true,
         callback: function (codes) {
+            $("#openreader-btn").hide();
             $("#log").text("Running validation... please wait...")
             $.get(subdir+"/validate", { data: codes }, function (res) {
+                $("#openreader-btn").show();
                 console.log(res)
                 res = JSON.parse(res);
                 if(res.error) {
