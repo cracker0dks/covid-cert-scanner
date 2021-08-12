@@ -1,60 +1,66 @@
-;(function( $, window, document, undefined ) {
+; (function ($, window, document, undefined) {
 
   "use strict";
 
   // cross browser request animation frame
-  if ( !window.requestAnimationFrame ) {
+  if (!window.requestAnimationFrame) {
 
-    window.requestAnimationFrame = ( function() {
+    window.requestAnimationFrame = (function () {
 
       return window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function ( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
 
-        window.setTimeout( callback, 1000 / 60 );
+          window.setTimeout(callback, 1000 / 60);
 
-      };
+        };
 
-    } )();
+    })();
 
   }
 
 
   var qrr, // our qrcode reader singletone instance 
-    QRCodeReader = function() {};
+    QRCodeReader = function () { };
 
+  var url = document.URL.substr(0, document.URL.lastIndexOf('/'));
+  var urlSplit = url.split("/");
+  var subdir = "";
+  for (var i = 3; i < urlSplit.length; i++) {
+    subdir = subdir + '/' + urlSplit[i];
+  }
   $.qrCodeReader = {
-    jsQRpath: "../js/jsQR/jsQR.min.js",
-    beepPath: "../audio/beep.mp3",
+    jsQRpath: subdir+"/js/jsQR/jsQR.min.js",
+    beepPath: subdir+"/audio/beep.mp3",
     instance: null,
     defaults: {
-        // single read or multiple readings/
-        multiple: false, 
-        // only triggers for QRCodes matching the regexp
-        qrcodeRegexp: /./, 
-        // play "Beep!" sound when reading qrcode successfully 
-        audioFeedback: true, 
-        // in case of multiple readings, after a successful reading,
-        // wait for repeatTimeout milliseconds before trying for the next lookup. 
-        // Set to 0 to disable automatic re-tries: in such case user will have to 
-        // click on the webcam canvas to trigger a new reading tentative
-        repeatTimeout: 1500, 
-        // target input element to fill in with the readings in case of successful reading 
-        // (newline separated in case of multiple readings).
-        // Such element can be specified as jQuery object or as string identifier, e.g. "#target-input"
-        target: null, 
-        // in case of multiple readings, skip duplicate readings
-        skipDuplicates: true,  
-        // color of the lines highlighting the QRCode in the image when found
-        lineColor: "#FF3B58",
-        // In case of multiple readings, function to call when pressing the OK button (or Enter), 
-        // in such case read QRCodes are passed as an array. 
-        // In case of single reading, call immediately after the successful reading 
-        // (in the latter case the QRCode is passed as a single string value)
-        callback: function(code) {} 
-      }
+      // single read or multiple readings/
+      multiple: false,
+      // only triggers for QRCodes matching the regexp
+      qrcodeRegexp: /./,
+      // play "Beep!" sound when reading qrcode successfully 
+      audioFeedback: true,
+      // in case of multiple readings, after a successful reading,
+      // wait for repeatTimeout milliseconds before trying for the next lookup. 
+      // Set to 0 to disable automatic re-tries: in such case user will have to 
+      // click on the webcam canvas to trigger a new reading tentative
+      repeatTimeout: 1500,
+      // target input element to fill in with the readings in case of successful reading 
+      // (newline separated in case of multiple readings).
+      // Such element can be specified as jQuery object or as string identifier, e.g. "#target-input"
+      target: null,
+      // in case of multiple readings, skip duplicate readings
+      skipDuplicates: true,
+      // color of the lines highlighting the QRCode in the image when found
+      lineColor: "#FF3B58",
+      // In case of multiple readings, function to call when pressing the OK button (or Enter), 
+      // in such case read QRCodes are passed as an array. 
+      // In case of single reading, call immediately after the successful reading 
+      // (in the latter case the QRCode is passed as a single string value)
+      callback: function (code) { }
+    }
   };
 
   QRCodeReader.prototype = {
@@ -69,8 +75,8 @@
       qrr.isOpen = false;
 
       // load the script performing the actual QRCode reading
-      $.getScript( $.qrCodeReader.jsQRpath, function( data, textStatus, jqxhr ) {
-        if ( jqxhr.status == 200) {
+      $.getScript($.qrCodeReader.jsQRpath, function (data, textStatus, jqxhr) {
+        if (jqxhr.status == 200) {
           qrr.scriptLoaded = true;
         } else {
           console.error("Error loading QRCode parser script");
@@ -81,37 +87,37 @@
     },
 
     // build the HTML interface of the widget
-    buildHTML: function() {
+    buildHTML: function () {
 
       qrr.bgOverlay = $('<div id="qrr-overlay"></div>');
       qrr.container = $('<div id="qrr-container"></div>');
-      
+
       qrr.closeBtn = $('<span id="qrr-close">&times;</span>')
       qrr.closeBtn.appendTo(qrr.container);
 
       qrr.okBtn = $('<a id="qrr-ok">OK</a>');
-            
+
       qrr.loadingMessage = $('<div id="qrr-loading-message">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>');
       qrr.canvas = $('<canvas id="qrr-canvas" class="hidden"></canvas>');
       qrr.audio = $('<audio hidden id="qrr-beep" src="' + $.qrCodeReader.beepPath + '" type="audio/mp3"></audio>');
-      
+
       qrr.outputDiv = $('<div id="qrr-output"></div>');
       qrr.outputNoData = $('<div id="qrr-nodata">No QR code detected.</div>');
       qrr.outputData = $('<div id="qrr-output-data"></div>');
-      
+
       qrr.outputNoData.appendTo(qrr.outputDiv);
       qrr.outputData.appendTo(qrr.outputDiv);
-      
+
       qrr.loadingMessage.appendTo(qrr.container);
       qrr.canvas.appendTo(qrr.container);
       qrr.outputDiv.appendTo(qrr.container);
       qrr.audio.appendTo(qrr.container);
       qrr.okBtn.appendTo(qrr.container);
-    
+
       qrr.bgOverlay.appendTo(document.body);
       qrr.bgOverlay.on("click", qrr.close);
       qrr.closeBtn.on("click", qrr.close);
-      
+
       qrr.container.appendTo(document.body);
 
       qrr.video = document.createElement("video");
@@ -119,7 +125,7 @@
     },
 
     // draw a line
-    drawLine: function(begin, end, color) {
+    drawLine: function (begin, end, color) {
       var canvas = qrr.canvas[0].getContext("2d");
       canvas.beginPath();
       canvas.moveTo(begin.x, begin.y);
@@ -130,7 +136,7 @@
     },
 
     // draw a rectangle around a matched QRCode image
-    drawBox: function(location, color) {
+    drawBox: function (location, color) {
       qrr.drawLine(location.topLeftCorner, location.topRightCorner, color);
       qrr.drawLine(location.topRightCorner, location.bottomRightCorner, color);
       qrr.drawLine(location.bottomRightCorner, location.bottomLeftCorner, color);
@@ -142,21 +148,21 @@
 
       // data-attributes options
       var dataOptions = {
-        multiple: $(element).data("qrr-multiple"), 
-        qrcodeRegexp: new RegExp($(element).data("qrr-qrcode-regexp")), 
-        audioFeedback: $(element).data("qrr-audio-feedback"), 
-        repeatTimeout: $(element).data("qrr-repeat-timeout"), 
-        target: $(element).data("qrr-target"), 
-        skipDuplicates: $(element).data("qrr-skip-duplicates"),  
+        multiple: $(element).data("qrr-multiple"),
+        qrcodeRegexp: new RegExp($(element).data("qrr-qrcode-regexp")),
+        audioFeedback: $(element).data("qrr-audio-feedback"),
+        repeatTimeout: $(element).data("qrr-repeat-timeout"),
+        target: $(element).data("qrr-target"),
+        skipDuplicates: $(element).data("qrr-skip-duplicates"),
         lineColor: $(element).data("qrr-line-color"),
         callback: $(element).data("qrr-callback")
       }
 
       // argument options override data-attributes options
-      options = $.extend( {}, dataOptions, options); 
-      
+      options = $.extend({}, dataOptions, options);
+
       // extend defaults with options
-      var settings = $.extend( {},  $.qrCodeReader.defaults, options);
+      var settings = $.extend({}, $.qrCodeReader.defaults, options);
 
       // save options in the data attributes
       $(element).data("qrr", settings);
@@ -172,7 +178,7 @@
 
       // prevent multiple opening
       if (qrr.isOpen) return;
-      
+
       // get options for the current called element
       qrr.getOptions(this);
 
@@ -196,8 +202,8 @@
       }
 
       // close on ESC, doneReading on Enter if multiple
-      $(document).on('keyup.qrCodeReader', function(e) {
-        if(e.keyCode === 27) {
+      $(document).on('keyup.qrCodeReader', function (e) {
+        if (e.keyCode === 27) {
           qrr.close();
         }
         if (qrr.settings.multiple && e.keyCode === 13) {
@@ -215,23 +221,23 @@
     },
 
     // get the camera, show video, start searching qrcode in the stream
-    start: function() {
+    start: function () {
       // Use {facingMode: environment} to attempt to get the front camera on phones
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function (stream) {
         qrr.video.srcObject = stream;
         qrr.video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
         qrr.video.play();
-        qrr.startReading(); 
+        qrr.startReading();
       });
     },
 
     // start continuously searching qrcode in the video stream
-    startReading: function() {
+    startReading: function () {
       qrr.requestID = window.requestAnimationFrame(qrr.read);
     },
 
     // done with reading QRcode
-    doneReading: function() {
+    doneReading: function () {
 
       var value = qrr.codes[0];
 
@@ -251,7 +257,7 @@
           } else {
             qrr.settings.callback(value);
           }
-        } catch(err) {
+        } catch (err) {
           console.error(err);
         }
       }
@@ -261,10 +267,10 @@
     },
 
     // search for a QRCode
-    read: function() {
+    read: function () {
       var codeRead = false;
       var canvas = qrr.canvas[0].getContext("2d");
-      
+
       qrr.loadingMessage.text("⌛ Loading video...");
       qrr.canvas.off("click.qrCodeReader", qrr.startReading);
 
@@ -275,9 +281,9 @@
         qrr.canvas[0].height = qrr.video.videoHeight;
         qrr.canvas[0].width = qrr.video.videoWidth;
         canvas.drawImage(qrr.video, 0, 0, qrr.canvas[0].width, qrr.canvas[0].height);
-        
+
         var imageData = canvas.getImageData(0, 0, qrr.canvas[0].width, qrr.canvas[0].height);
-        
+
         // this performs the actual QRCode reading
         var code = jsQR(imageData.data, imageData.width, imageData.height, {
           inversionAttempts: "dontInvert",
@@ -301,14 +307,14 @@
           if (qrr.settings.multiple) {
 
             // avoid duplicates
-            if(qrr.settings.skipDuplicates) {
+            if (qrr.settings.skipDuplicates) {
               qrr.codes = $.unique(qrr.codes);
             }
 
             // show our reading
             $('<div class="qrr-input"></div>').text(code.data).appendTo(qrr.outputData);
             qrr.outputDiv[0].scrollTop = qrr.outputDiv[0].scrollHeight;
-            
+
             // read again by clicking on the canvas
             qrr.canvas.on("click.qrCodeReader", qrr.startReading);
 
@@ -320,20 +326,20 @@
               qrr.loadingMessage.show();
             }
 
-          // single reading
+            // single reading
           } else {
             qrr.doneReading();
           }
         }
       }
 
-      if (!codeRead) { 
+      if (!codeRead) {
         qrr.startReading();
       }
 
     },
 
-    close: function() {
+    close: function () {
 
       // cancel the refresh function
       if (qrr.requestID) {
@@ -347,7 +353,7 @@
       if (qrr.video.srcObject) {
         qrr.video.srcObject.getTracks()[0].stop();
       }
-      
+
       // hide the GUI
       qrr.canvas.addClass("hidden");
       qrr.loadingMessage.show();
@@ -360,24 +366,24 @@
 
   };
 
-  $.fn.qrCodeReader = function ( options ) {
+  $.fn.qrCodeReader = function (options) {
 
     // Instantiate the plugin only once (singletone) in the page:
     // when called again (or on a different element), we simply re-set the options 
     // and display the QrCode reader interface with the right options.
     // Options are saved in the data attribute of the bound element.
-    
-    if(!$.qrCodeReader.instance) {
+
+    if (!$.qrCodeReader.instance) {
       qrr = new QRCodeReader();
       qrr.init();
       $.qrCodeReader.instance = qrr;
-    } 
+    }
 
     return this.each(function () {
       qrr.setOptions(this, options);
       $(this).off("click.qrCodeReader").on("click.qrCodeReader", qrr.open);
     });
-      
+
   };
 
-}( jQuery, window, document ));
+}(jQuery, window, document));
