@@ -41,8 +41,6 @@ import { sign } from "cose-js";
 import { inflate } from "pako";
 import { createHash as rawHash } from "sha256-uint8array";
 
-import { PASS } from "./pass.js";
-
 import * as fs from 'fs';
 let rawdata = fs.readFileSync('certs.json'); //Certfile from: https://raw.githubusercontent.com/Scopevisio/eudgc/main/src/certs.json
 let certs = JSON.parse(rawdata);
