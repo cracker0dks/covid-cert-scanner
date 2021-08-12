@@ -1,0 +1,2 @@
+# covid-cert-scanner
+
