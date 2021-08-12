@@ -12,10 +12,17 @@ $(document).ready(function () {
         multiple: false,
         skipDuplicates: true,
         callback: function (codes) {
-            $("#log").text(JSON.stringify(codes));
+            $("#log").text("Running validation... please wait...")
             $.get(subdir+"/validate", { data: codes }, function (res) {
                 console.log(res)
-                $("#log2").text(res)
+                res = JSON.parse(res);
+                if(res.error) {
+                    $("#log").text(JSON.stringify(res.error, null, 2))
+                } else {
+                    $("#log").text(JSON.stringify(res.data, null, 2))
+                }
+                
+                
             });
             console.log(codes);
         }
