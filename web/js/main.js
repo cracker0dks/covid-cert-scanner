@@ -8,7 +8,7 @@ for (var i = 3; i < urlSplit.length; i++) {
 $(document).ready(function () {
     $("#openreader-btn").qrCodeReader({
         target: "#target-input",
-        audioFeedback: true,
+        audioFeedback: false,
         multiple: false,
         skipDuplicates: true,
         callback: function (codes) {
@@ -19,7 +19,7 @@ $(document).ready(function () {
                 if(res.error) {
                     $("#log").text(JSON.stringify(res.error, null, 2))
                 } else {
-                    $("#log").text("<b>Success:</b><br>"+JSON.stringify(res.data, null, 2))
+                    $("#log").text("Success: "+JSON.stringify(res.data, null, 2))
                 }
             });
             console.log(codes);
