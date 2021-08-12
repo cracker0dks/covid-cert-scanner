@@ -99,7 +99,7 @@
 
       qrr.loadingMessage = $('<div id="qrr-loading-message">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>');
       qrr.canvas = $('<canvas id="qrr-canvas" class="hidden"></canvas>');
-      qrr.audio = $('<audio hidden id="qrr-beep" src="' + $.qrCodeReader.beepPath + '" type="audio/mp3"></audio>');
+      qrr.audio = $('<audio volume="0.5" hidden id="qrr-beep" src="' + $.qrCodeReader.beepPath + '" type="audio/mp3"></audio>');
 
       qrr.outputDiv = $('<div id="qrr-output"></div>');
       qrr.outputNoData = $('<div id="qrr-nodata">No QR code detected.</div>');

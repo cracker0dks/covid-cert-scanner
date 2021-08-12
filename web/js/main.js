@@ -19,10 +19,8 @@ $(document).ready(function () {
                 if(res.error) {
                     $("#log").text(JSON.stringify(res.error, null, 2))
                 } else {
-                    $("#log").text(JSON.stringify(res.data, null, 2))
+                    $("#log").text("<b>Success:</b><br>"JSON.stringify(res.data, null, 2))
                 }
-                
-                
             });
             console.log(codes);
         }
