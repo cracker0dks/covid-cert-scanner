@@ -12,7 +12,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import express from 'express';
-import * as http from 'http';
 
 var app = express();
 
