@@ -1,12 +1,15 @@
 ## Digital Covid Certificate Decoder
 
-An attempt to decode the Digital Covid Certificate
+Decode the Digital Covid Certificate
+
+## Demo
+https://cloud13.de/cov/
 
 ## How to use
 
 1. Run `npm install`
 2. Run `npm start`
-3. Surf to `127.0.0.1:8080` and scan your QR Code
+3. Surf to `127.0.0.1:8080` or your host and scan your Cov QR Code
 3. The decoded data should be printed if cert is vaild like this:
 
 ```
@@ -41,4 +44,4 @@ Success: {
 
 ## Disclaimers
 
-This Repo is in Alpha state. Do not run in production!
+This Repo is in Alpha state. Do not run this in production!
