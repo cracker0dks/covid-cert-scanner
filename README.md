@@ -5,7 +5,7 @@ Decode the Digital Covid Certificate
 ## Demo
 https://cloud13.de/cov/
 
-## How to use
+## Install and How to use
 
 1. Run `npm install`
 2. Run `npm start`
@@ -45,3 +45,5 @@ Success: {
 ## Disclaimers
 
 This Repo is in Alpha state. Do not run this in production!
+
+Some code parts are from: Wassim Chegham https://github.com/manekinekko/digital-covid-certificate-decoder
