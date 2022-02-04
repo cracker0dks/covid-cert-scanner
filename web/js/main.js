@@ -13,7 +13,8 @@ $(document).ready(function () {
         skipDuplicates: true,
         callback: function (codes) {
             $("#openreader-btn").hide();
-            $("#log").text("Running validation... please wait...")
+            $("#log").text("Running validation... please wait...");
+            console.log(codes)
             $.get(subdir+"/validate", { data: codes }, function (res) {
                 $("#openreader-btn").show();
                 console.log(res)

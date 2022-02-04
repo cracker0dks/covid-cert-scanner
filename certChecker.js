@@ -42,9 +42,9 @@ import { inflate } from "pako";
 import { createHash as rawHash } from "sha256-uint8array";
 
 import * as fs from 'fs';
-let rawdata = fs.readFileSync('certs.json'); //Certfile from: https://raw.githubusercontent.com/Scopevisio/eudgc/main/src/certs.json
+let rawdata = fs.readFileSync('certs.json'); //Certfile from: https://de.dscg.ubirch.com/trustList/DSC/
 let certs = JSON.parse(rawdata);
-certs = certs["certs"];
+certs = certs["certificates"];
 
 export function checkCert(PASS, callback) {
   let certCntLeft = certs.length;
@@ -101,7 +101,7 @@ export function checkCert(PASS, callback) {
     //console.log("Start Check!");
     for (let i in certs) {
       if (!success) {
-        checkAgainsCert('-----BEGIN CERTIFICATE-----\n' + certs[i]["rawX509data"] + '\n-----END CERTIFICATE-----');
+        checkAgainsCert('-----BEGIN CERTIFICATE-----\n' + certs[i]["rawData"] + '\n-----END CERTIFICATE-----');
       }
     }
   } catch (e) {
